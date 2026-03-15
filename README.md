@@ -11,6 +11,48 @@ Based on [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) —
 
 ---
 
+## Commands Reference
+
+| Command | Description | Since |
+|---------|-------------|-------|
+| `/autoresearch` | Run the autonomous iteration loop (unlimited) | v1.0.0 |
+| `/loop N /autoresearch` | Run exactly N iterations then stop | v1.0.1 |
+| `/autoresearch:plan` | Interactive wizard: Goal → Scope, Metric, Verify config | v1.0.2 |
+| `/autoresearch:security` | Autonomous STRIDE + OWASP security audit | v1.0.3 |
+| `/autoresearch:security --diff` | Delta mode — only audit files changed since last audit | v1.0.3 |
+| `/autoresearch:security --fix` | Auto-fix confirmed Critical/High findings after audit | v1.0.3 |
+| `/autoresearch:security --fail-on critical` | Exit non-zero if severity threshold met (CI/CD gate) | v1.0.3 |
+| `/loop N /autoresearch:security` | Bounded security audit (N iterations) | v1.0.3 |
+
+### Flag Combinations
+
+```bash
+# Full combo: delta + auto-fix + CI gate
+/loop 15 /autoresearch:security --diff --fix --fail-on critical
+
+# CI/CD: quick delta check, block on criticals
+/loop 5 /autoresearch:security --diff --fail-on critical
+
+# Overnight: comprehensive audit with auto-remediation
+/autoresearch:security --fix
+
+# Plan then run: wizard builds config, launches immediately
+/autoresearch:plan
+```
+
+### Quick Decision Guide
+
+| I want to... | Use |
+|--------------|-----|
+| Improve test coverage / reduce bundle size / any metric | `/autoresearch` or `/loop N /autoresearch` |
+| Don't know what metric to use | `/autoresearch:plan` |
+| Run a security audit | `/autoresearch:security` or `/loop 10 /autoresearch:security` |
+| Audit only changed files (PR review) | `/autoresearch:security --diff` |
+| Auto-fix security issues | `/autoresearch:security --fix` |
+| Block CI pipeline on vulnerabilities | `/autoresearch:security --fail-on critical` |
+
+---
+
 ## What Is This?
 
 A [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) that makes Claude iterate autonomously on ANY task with a measurable outcome — like Karpathy's autoresearch, but generalized beyond ML.
