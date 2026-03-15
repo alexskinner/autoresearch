@@ -16,7 +16,7 @@ Inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch).
 |------------|---------|
 | `/autoresearch` | Run the autonomous loop (default) |
 | `/autoresearch:plan` | Interactive wizard to build Scope, Metric, Direction & Verify from a Goal |
-| `/autoresearch:security` | Autonomous security audit with STRIDE threat model + OWASP Top 10 sweep |
+| `/autoresearch:security` | Autonomous security audit: STRIDE threat model + OWASP Top 10 + red-team (4 adversarial personas) |
 
 ### /autoresearch:security — Autonomous Security Audit (v1.0.3)
 

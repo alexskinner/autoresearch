@@ -18,11 +18,13 @@ Based on [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) —
 | `/autoresearch` | Run the autonomous iteration loop (unlimited) | v1.0.0 |
 | `/loop N /autoresearch` | Run exactly N iterations then stop | v1.0.1 |
 | `/autoresearch:plan` | Interactive wizard: Goal → Scope, Metric, Verify config | v1.0.2 |
-| `/autoresearch:security` | Autonomous STRIDE + OWASP security audit | v1.0.3 |
+| `/autoresearch:security` | Autonomous STRIDE + OWASP + red-team security audit | v1.0.3 |
 | `/autoresearch:security --diff` | Delta mode — only audit files changed since last audit | v1.0.3 |
 | `/autoresearch:security --fix` | Auto-fix confirmed Critical/High findings after audit | v1.0.3 |
 | `/autoresearch:security --fail-on critical` | Exit non-zero if severity threshold met (CI/CD gate) | v1.0.3 |
 | `/loop N /autoresearch:security` | Bounded security audit (N iterations) | v1.0.3 |
+
+**Security audit includes:** STRIDE threat model, OWASP Top 10 (70+ checks), 4 red-team adversarial personas (Security Adversary, Supply Chain Attacker, Insider Threat, Infrastructure Attacker), proof-of-concept validation, structured report folder, historical comparison.
 
 ### Flag Combinations
 
@@ -47,6 +49,7 @@ Based on [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) —
 | Improve test coverage / reduce bundle size / any metric | `/autoresearch` or `/loop N /autoresearch` |
 | Don't know what metric to use | `/autoresearch:plan` |
 | Run a security audit | `/autoresearch:security` or `/loop 10 /autoresearch:security` |
+| Red-team my codebase | `/autoresearch:security` (includes 4 adversarial personas) |
 | Audit only changed files (PR review) | `/autoresearch:security --diff` |
 | Auto-fix security issues | `/autoresearch:security --fix` |
 | Block CI pipeline on vulnerabilities | `/autoresearch:security --fail-on critical` |
