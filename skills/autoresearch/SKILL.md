@@ -262,14 +262,65 @@ When a loop count is specified:
 
 ## Setup Phase (Do Once)
 
+**If the user provides Goal, Scope, Metric, and Verify inline** → extract them and proceed to step 5.
+
+**If any critical field is missing** → use `AskUserQuestion` to collect them interactively:
+
+### Interactive Setup (when invoked without full config)
+
+Use `AskUserQuestion` to gather each missing field. Scan the codebase first to provide smart defaults.
+
+**Question 1 — Goal** (always ask if not provided):
+```
+Header: "Autoresearch Setup"
+Question: "What do you want to improve?"
+Options: (leave empty — free text response)
+```
+
+**Question 2 — Scope** (suggest based on codebase scan):
+```
+Header: "Scope"
+Question: "Which files can autoresearch modify?"
+Options: [suggested globs based on project structure, e.g. "src/**/*.ts", "content/**/*.md"]
+```
+Validate: glob must resolve to ≥1 file. If zero matches, ask again.
+
+**Question 3 — Metric & Direction** (suggest based on tooling detected):
+```
+Header: "Metric"
+Question: "What number tells you if things got better? (must be mechanical — command output, not subjective)"
+Options: [detected options, e.g. "coverage % (higher)", "bundle size KB (lower)", "error count (lower)", "test pass count (higher)"]
+```
+Validate: must be extractable as a number from a command output.
+
+**Question 4 — Verify Command** (construct and dry-run):
+```
+Header: "Verify Command"
+Question: "What command produces the metric? (I'll dry-run it to confirm)"
+Options: [suggested commands based on detected tooling, e.g. "npm test -- --coverage | grep 'All files'"]
+```
+Validate: dry-run the command. Must exit 0 and output a parseable number.
+
+**Question 5 — Guard (optional)**:
+```
+Header: "Guard (optional)"
+Question: "Any command that must ALWAYS pass? (prevents regressions — leave blank to skip)"
+Options: ["npm test", "tsc --noEmit", "Skip — no guard"]
+```
+
+After collecting all fields, display the complete config and ask for confirmation:
+```
+Header: "Ready to Launch"
+Question: "Config looks good?"
+Options: ["Launch (unlimited)", "Launch with /loop N", "Edit config", "Cancel"]
+```
+
+### Setup Steps (after config is complete)
+
 1. **Read all in-scope files** for full context before any modification
-2. **Define the goal** — What does "better" mean? Extract or ask for a mechanical metric:
-   - Code: tests pass, build succeeds, performance benchmark improves
-   - Content: word count target hit, SEO score improves, readability score
-   - Design: lighthouse score, accessibility audit passes
-   - If no metric exists → define one with user, or use simplest proxy (e.g. "compiles without errors")
-3. **Define scope constraints** — Which files can you modify? Which are read-only?
-4. **Define guard (optional)** — A command that must ALWAYS pass for a change to be kept. Use this to prevent regressions while optimizing the main metric (e.g., `npm test` must pass while optimizing benchmark time). If not specified, no guard is enforced.
+2. **Define the goal** — extracted from user input or inline config
+3. **Define scope constraints** — validated file globs
+4. **Define guard (optional)** — regression prevention command
 5. **Create a results log** — Track every iteration (see `references/results-logging.md`)
 6. **Establish baseline** — Run verification on current state AND guard (if set). Record as iteration #0
 7. **Confirm and go** — Show user the setup, get confirmation, then BEGIN THE LOOP

@@ -26,6 +26,41 @@ Scope: src/**/*.ts
 Guard: npm run typecheck
 ```
 
+## Interactive Setup (when invoked without flags)
+
+If `/autoresearch:fix` is invoked without explicit `--target`, `--guard`, or `--scope`, use `AskUserQuestion` to confirm the fix strategy. First auto-detect failures, then present findings.
+
+**Step 1 — Auto-detect and present:**
+Run test suite, type checker, linter, and build. Then ask:
+```
+Header: "Fix Setup — Detected Issues"
+Question: "Found [N] test failures, [M] type errors, [K] lint errors. What should I fix?"
+Options: ["Fix everything (recommended)", "Only tests", "Only type errors", "Only lint", "Let me specify"]
+```
+
+**Step 2 — Guard (if not specified):**
+```
+Header: "Regression Guard"
+Question: "What command must ALWAYS pass? (prevents fixes from breaking other things)"
+Options: ["npm test", "tsc --noEmit", "npm run build", "Skip — no guard", "Custom command"]
+```
+
+**Step 3 — Scope (if not specified):**
+```
+Header: "Scope"
+Question: "Which files can I modify?"
+Options: ["All project files (src/**)", suggested globs from error locations, "Let me specify"]
+```
+
+**Step 4 — Confirm and launch:**
+```
+Header: "Ready to Fix"
+Question: "Target: [N] errors | Guard: [command] | Scope: [glob]. Start?"
+Options: ["Launch (fix until zero)", "Launch with /loop N", "Edit config", "Cancel"]
+```
+
+If the user provides `--target`, `--guard`, `--scope`, or `--from-debug` flags, skip the interactive setup and proceed directly to Phase 1.
+
 ## Architecture
 
 ```

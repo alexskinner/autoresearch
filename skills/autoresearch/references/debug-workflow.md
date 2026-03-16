@@ -25,6 +25,33 @@ Scope: src/api/**/*.ts
 Symptom: API returns 500 on POST /users
 ```
 
+## Interactive Setup (when invoked without flags)
+
+If `/autoresearch:debug` is invoked without `--scope` or `--symptom`, use `AskUserQuestion` to gather context before investigating.
+
+**Step 1 — What's wrong?**
+```
+Header: "Debug Setup"
+Question: "What's the issue? (describe the symptom, paste an error, or say 'hunt all bugs')"
+Options: ["Hunt all bugs (scan entire codebase)", "Specific error (I'll describe it)", "Failing tests", "CI/CD failure", "Performance issue"]
+```
+
+**Step 2 — Scope:**
+```
+Header: "Investigation Scope"
+Question: "Which files should I investigate?"
+Options: [suggested globs based on error locations or project structure, "Entire codebase", "Let me specify"]
+```
+
+**Step 3 — After finding bugs, what to do?**
+```
+Header: "After Debugging"
+Question: "When bugs are found, should I also fix them?"
+Options: ["Find bugs only (report)", "Find and fix (chain to /autoresearch:fix)", "Ask me after each finding"]
+```
+
+If `--scope`, `--symptom`, or `--fix` flags are provided, skip the interactive setup and proceed directly to Phase 1.
+
 ## Architecture
 
 ```
