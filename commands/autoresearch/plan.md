@@ -4,10 +4,15 @@ description: Interactive wizard to build Scope, Metric, Direction & Verify from 
 argument-hint: "[goal description]"
 ---
 
-EXECUTE IMMEDIATELY — do not ask clarifying questions before reading the protocol.
+EXECUTE IMMEDIATELY — do not deliberate, do not ask clarifying questions before reading the protocol.
 
-1. Read the plan workflow: `.claude/skills/autoresearch/references/plan-workflow.md` — this is the FULL protocol
-2. Accept the user's goal from arguments: $ARGUMENTS
-3. Execute the 7-step planning wizard as defined in `plan-workflow.md`
+## Argument Parsing (do this FIRST)
 
-Follow the protocol exactly. All gates (mechanical metric, dry-run, scope resolution) must pass before accepting. Stream all output live — never run this in background.
+Extract the goal from $ARGUMENTS. The user may provide extensive context — treat the entire text as goal context. Look for `Goal:` keyword; if absent, the full $ARGUMENTS text IS the goal.
+
+## Execution
+
+1. Read the plan workflow: `.claude/skills/autoresearch/references/plan-workflow.md`
+2. Execute the 7-step planning wizard
+
+Stream all output live — never run in background.

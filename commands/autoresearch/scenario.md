@@ -4,11 +4,29 @@ description: Scenario-driven use case generator — explores situations, edge ca
 argument-hint: "[scenario description] [--scope <glob>] [--depth shallow|standard|deep] [--domain <type>] [--iterations N]"
 ---
 
-EXECUTE IMMEDIATELY — do not ask clarifying questions before reading the protocol.
+EXECUTE IMMEDIATELY — do not deliberate, do not ask clarifying questions before reading the protocol.
 
-1. Read the scenario workflow: `.claude/skills/autoresearch/references/scenario-workflow.md` — this is the FULL protocol
-2. Parse any flags from the user's arguments: $ARGUMENTS
-3. If scenario or domain is missing — use `AskUserQuestion` with adaptive questions per scenario-workflow.md
-4. Execute the 7-phase scenario loop as defined in `scenario-workflow.md`
+## Argument Parsing (do this FIRST)
 
-Follow the protocol exactly. Every scenario requires concrete context (who, what, when, where). Stream all output live — never run this in background.
+Extract these from $ARGUMENTS — the user may provide extensive context alongside flags. Ignore prose and extract ONLY flags/config:
+
+- `--domain <type>` or `Domain:` — software, product, business, security, marketing
+- `--depth <level>` or `Depth:` — shallow (10 iterations), standard (25), deep (50+)
+- `--scope <glob>` or `Scope:` — file globs
+- `--format <type>` — use-cases, user-stories, test-scenarios, threat-scenarios
+- `--focus <area>` — edge-cases, failures, security, scale
+- `Iterations:` or `--iterations N` — integer for bounded mode (CRITICAL: run exactly N iterations then stop). Overrides depth preset.
+- `Scenario:` — text after "Scenario:" keyword
+
+All remaining text not matching flags is the scenario description.
+
+If `Iterations: N` or `--iterations N` is found, set `max_iterations = N`. Track `current_iteration`. After N, STOP.
+
+## Execution
+
+1. Read the scenario workflow: `.claude/skills/autoresearch/references/scenario-workflow.md`
+2. If scenario or domain is missing — use `AskUserQuestion` with adaptive questions per scenario-workflow.md
+3. Execute the 7-phase scenario loop
+4. If bounded: after each iteration, check `current_iteration < max_iterations`. If not, STOP and print summary.
+
+Stream all output live — never run in background.

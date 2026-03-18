@@ -1,14 +1,30 @@
 ---
 name: autoresearch:security
 description: Autonomous security audit — STRIDE threat model + OWASP Top 10 + red-team with 4 adversarial personas
-argument-hint: "[--diff] [--fix] [--fail-on <severity>]"
+argument-hint: "[--diff] [--fix] [--fail-on <severity>] [--iterations N]"
 ---
 
-EXECUTE IMMEDIATELY — do not ask clarifying questions before reading the protocol.
+EXECUTE IMMEDIATELY — do not deliberate, do not ask clarifying questions before reading the protocol.
 
-1. Read the security workflow: `.claude/skills/autoresearch/references/security-workflow.md` — this is the FULL protocol
-2. Parse any flags from the user's arguments: $ARGUMENTS
-3. If scope is missing — use `AskUserQuestion` with batched questions per security-workflow.md
-4. Execute the 7-step security audit as defined in `security-workflow.md`
+## Argument Parsing (do this FIRST)
 
-Follow the protocol exactly. Every finding requires code evidence (file:line + attack scenario). Stream all output live — never run this in background.
+Extract these from $ARGUMENTS — the user may provide extensive context alongside flags. Ignore prose and extract ONLY flags/config:
+
+- `--diff` — only audit files changed since last audit
+- `--fix` — auto-fix confirmed Critical/High findings
+- `--fail-on <severity>` — exit non-zero for CI/CD gating
+- `Scope:` or `--scope <glob>` — file globs to audit
+- `Iterations:` or `--iterations N` — integer for bounded mode (CRITICAL: run exactly N iterations then stop)
+
+If `Iterations: N` or `--iterations N` is found, set `max_iterations = N`. Track `current_iteration` starting at 0. After iteration N, print final summary and STOP.
+
+All remaining text in $ARGUMENTS is additional context — use it to understand scope but do not treat it as flags.
+
+## Execution
+
+1. Read the security workflow: `.claude/skills/autoresearch/references/security-workflow.md`
+2. If scope is missing — use `AskUserQuestion` with batched questions per security-workflow.md
+3. Execute the 7-step security audit
+4. If bounded: after each iteration, check `current_iteration < max_iterations`. If not, STOP and print summary.
+
+Stream all output live — never run in background.
